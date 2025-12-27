@@ -46,9 +46,9 @@ async function bootstrap() {
 // Call the bootstrap function and handle success/error logging
 bootstrap()
   .then(() => {
-    logger.log('Catalog (TCP) service started successfully');
+    logger.log('Catalog (RMQ) service started successfully');
   })
   .catch((err) => {
-    logger.error('Error starting Catalog (TCP) service', err);
+    logger.error('Error starting Catalog (RMQ) service', err);
     process.exit(1);
   });

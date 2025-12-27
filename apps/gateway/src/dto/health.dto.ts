@@ -1,6 +1,6 @@
-export type HealthCheckResponse = {
-  status: string;
-  timestamp: string;
-  uptime: number;
-  service: string;
+import { ClientProxy } from '@nestjs/microservices';
+
+export type ServicePingDto = {
+  serviceName: string;
+  client: ClientProxy;
 };

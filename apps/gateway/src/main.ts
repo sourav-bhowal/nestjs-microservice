@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core';
 import { GatewayModule } from './gateway.module';
 import { Logger } from '@nestjs/common';
 
+const logger = new Logger('GatewayBootstrap');
+
 async function bootstrap() {
   process.title = 'Gateway Service';
 
@@ -21,11 +23,9 @@ async function bootstrap() {
 // Call the bootstrap function and handle success/error logging
 bootstrap()
   .then(() => {
-    const logger = new Logger('GatewayBootstrap');
     logger.log('Gateway service started successfully');
   })
   .catch((err) => {
-    const logger = new Logger('GatewayBootstrap');
     logger.error('Error starting Gateway service', err);
     process.exit(1);
   });
