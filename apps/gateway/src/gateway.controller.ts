@@ -1,7 +1,8 @@
 import { Controller, Get, Inject } from '@nestjs/common';
-import { ServicePingDto } from './dto/health.dto';
+import { ServicePingType } from './types/health.type';
 import { firstValueFrom } from 'rxjs';
 import { ClientProxy } from '@nestjs/microservices';
+import { PingResponseType } from './types/ping.type';
 
 @Controller()
 export class GatewayController {
@@ -13,29 +14,28 @@ export class GatewayController {
 
   @Get('health')
   async checkHealth() {
-    const ping = async ({ serviceName, client }: ServicePingDto) => {
+    const ping = async ({ serviceName, client }: ServicePingType) => {
       try {
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-        const result = await firstValueFrom(
-          client.send('service.ping', { from: 'gateway' }),
+        // Send ping message to the service
+        const result: PingResponseType = await firstValueFrom(
+          client.send<PingResponseType>('service.ping', { from: 'gateway' }),
         );
 
         return {
           ok: true,
           service: serviceName,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
           result,
         };
       } catch (error) {
         return {
           ok: false,
           service: serviceName,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access
-          error: error.message ?? 'unknown error',
+          error: error instanceof Error ? error.message : 'Unknown error',
         };
       }
     };
 
+    // Ping all services concurrently
     const [catalog, media, search] = await Promise.all([
       ping({
         serviceName: 'catalog',
@@ -51,8 +51,10 @@ export class GatewayController {
       }),
     ]);
 
+    // Determine overall health status
     const allOk = [catalog, media, search].every((res) => res.ok);
 
+    // Return health status
     return {
       status: allOk ? 'ok' : 'degraded',
       services: {

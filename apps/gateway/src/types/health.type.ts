@@ -1,6 +1,6 @@
 import { ClientProxy } from '@nestjs/microservices';
 
-export type ServicePingDto = {
+export type ServicePingType = {
   serviceName: string;
   client: ClientProxy;
 };
